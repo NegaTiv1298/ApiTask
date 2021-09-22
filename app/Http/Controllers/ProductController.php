@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Database\Eloquent\Collection;
 
 class ProductController extends Controller
 {
@@ -27,7 +28,6 @@ class ProductController extends Controller
             $sku = $elem['variants'][0]['sku'];
             $image = $elem['image']['src'];
 
-
             Product::updateOrCreate(
                 ['sku' => $sku],
                 [
@@ -41,5 +41,39 @@ class ProductController extends Controller
 
                 ]);
         }
+    }
+
+    /**
+     * Show all products via api request.
+     *
+     * @return Product[]|Collection
+     */
+    public function getAllProducts()
+    {
+
+        return Product::all();
+    }
+
+    /**
+     * Show products with additional parameters via api request.
+     *
+     * @param string $filter
+     * @param string|null $sort
+     * @param int|null $paginate
+     * @return mixed
+     */
+    public function getSortProducts(string $filter, string $sort = null, int $paginate = null)
+    {
+        if ($sort == null && $paginate == null) {
+            $result = Product::orderBy($filter, 'asc')->get();
+        } elseif ($sort != null && $paginate != null) {
+            $result = Product::orderBy($filter, $sort)->paginate($paginate);
+        } elseif ($sort == null && $paginate != null) {
+            $result = Product::orderBy($filter, 'asc')->paginate($paginate);
+        } elseif ($sort != null && $paginate == null) {
+            $result = Product::orderBy($filter, $sort)->get();
+        }
+
+        return $result;
     }
 }
