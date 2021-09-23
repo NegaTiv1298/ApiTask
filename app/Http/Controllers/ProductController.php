@@ -64,16 +64,10 @@ class ProductController extends Controller
      */
     public function getSortProducts(string $filter, string $sort = null, int $paginate = null)
     {
-        if ($sort == null && $paginate == null) {
-            $result = Product::orderBy($filter, 'asc')->get();
-        } elseif ($sort != null && $paginate != null) {
-            $result = Product::orderBy($filter, $sort)->paginate($paginate);
-        } elseif ($sort == null && $paginate != null) {
-            $result = Product::orderBy($filter, 'asc')->paginate($paginate);
-        } elseif ($sort != null && $paginate == null) {
-            $result = Product::orderBy($filter, $sort)->get();
+        if ($sort == null) {
+            $sort = 'asc';
         }
 
-        return $result;
+        return Product::orderBy($filter, $sort)->paginate($paginate);
     }
 }
